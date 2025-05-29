@@ -31,7 +31,10 @@ const products = [
   },
   {
     name: 'Classic Butter Cookies',
-    images: [{ url: '/images/butter-cookies.jpg', primary: true }],
+    images: [
+      { url: '/images/butter-cookies.jpg', primary: true },
+      { url: '/images/butter-cookies2.jpg', primary: false },
+    ],
     description:
       'Crispy, buttery cookies made with premium ingredients. Great for tea time or gifting.',
     brand: 'Tiya Bakers',
@@ -43,7 +46,10 @@ const products = [
   },
   {
     name: 'Strawberry Pastry',
-    images: [{ url: '/images/strawberry-pastry.jpg', primary: true }],
+    images: [
+      { url: '/images/strawberry-pastry.jpg', primary: true },
+      { url: '/images/strawberry-pastry2.jpg', primary: false },
+    ],
     description:
       'Fresh strawberry cream layered between fluffy vanilla sponge, finished with juicy strawberry glaze.',
     brand: 'Tiya Bakers',
@@ -55,7 +61,10 @@ const products = [
   },
   {
     name: 'Choco Chip Muffin',
-    images: [{ url: '/images/choco-chip-muffin.jpg', primary: true }],
+    images: [
+      { url: '/images/choco-chip-muffin.jpg', primary: true },
+      { url: '/images/choco-chip-muffin2.jpg', primary: false },
+    ],
     description:
       'Soft muffins loaded with chocolate chips, perfect for breakfast or a sweet snack on the go.',
     brand: 'Tiya Bakers',
@@ -67,7 +76,10 @@ const products = [
   },
   {
     name: 'Vanilla Birthday Cake',
-    images: [{ url: '/images/vanilla-cake.jpg', primary: true }],
+    images: [
+      { url: '/images/vanilla-cake.jpg', primary: true },
+      { url: '/images/vanilla-cake2.jpg', primary: false },
+    ],
     description:
       'Elegant vanilla sponge with layers of whipped cream and your choice of design and message. Ideal for any celebration.',
     brand: 'Tiya Bakers',

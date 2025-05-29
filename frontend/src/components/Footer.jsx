@@ -39,11 +39,23 @@ const Footer = () => {
           <Col md={4} className='mb-3'>
             <h5>Contact Us</h5>
             <p>
-              📍 123 Baker Street, Delhi
+              📍 2345, Sector-3, Faridabad
               <br />
-              📞 +91 98765 43210
+              📞{' '}
+              <a
+                href='tel:+919560419736'
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                +91 95604 19736
+              </a>
               <br />
-              📧 support@tiyabakers.com
+              📧{' '}
+              <a
+                href='mailto:support@tiyabakers.com'
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                support@tiyabakers.com
+              </a>
             </p>
           </Col>
         </Row>
