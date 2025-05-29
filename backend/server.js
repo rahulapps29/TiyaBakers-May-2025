@@ -11,7 +11,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 4068;
 
 connectDB();
 
@@ -19,7 +19,7 @@ const app = express();
 // Basic CORS configuration
 app.use(
   cors({
-    origin: 'http://localhost:3000', // replace with your frontend URL
+    origin: '*', // replace with your frontend URL
     credentials: true, // allow cookies if needed
   })
 );
