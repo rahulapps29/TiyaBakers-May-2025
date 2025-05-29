@@ -35,6 +35,7 @@ const LoginScreen = () => {
     try {
       const res = await login({ email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
+      console.log(res.token); // Should print the token
       navigate(redirect);
     } catch (err) {
       toast.error(err?.data?.message || err.error);
