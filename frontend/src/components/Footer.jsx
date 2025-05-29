@@ -1,7 +1,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import './Footer.css';
-
+import logo from '../assets/TB2.png';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -10,8 +10,17 @@ const Footer = () => {
       <Container className='py-4'>
         <Row>
           <Col md={4} className='mb-3'>
-            <h5>Tiya Bakers</h5>
-            <p>
+            <div className='d-flex align-items-center mb-2'>
+              <img
+                src={logo}
+                alt='Tiya Bakers'
+                width='auto'
+                height='40'
+                className='d-inline-block align-top me-2'
+              />
+              {/* <h5 className='mb-0'>Tiya Bakers</h5> */}
+            </div>
+            <p className='mt-1'>
               Freshly baked happiness!
               <br />
               Delicious cakes, cookies, and more.
