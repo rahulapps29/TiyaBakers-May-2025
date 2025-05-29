@@ -14,7 +14,7 @@ const Product = ({ product }) => {
           src={primaryImage.url}
           variant='top'
           style={{
-            height: '200px',
+            height: 'auto',
             objectFit: 'cover',
             objectPosition: 'top center',
             borderRadius: '6px',
