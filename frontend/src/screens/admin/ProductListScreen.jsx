@@ -70,7 +70,7 @@ const ProductListScreen = () => {
           <Table striped bordered hover responsive className='table-sm'>
             <thead>
               <tr>
-                {/* <th>ID</th> */}
+                <th>IMAGE</th>
                 <th>NAME</th>
                 <th>PRICE</th>
                 <th>CATEGORY</th>
@@ -79,32 +79,55 @@ const ProductListScreen = () => {
               </tr>
             </thead>
             <tbody>
-              {data.products.map((product) => (
-                <tr key={product._id}>
-                  {/* <td>{product._id}</td> */}
-                  <td>{product.name}</td>
-                  <td>₹{product.price}</td>
-                  <td>{product.category}</td>
-                  <td>{product.brand}</td>
-                  <td>
-                    <Button
-                      as={Link}
-                      to={`/admin/product/${product._id}/edit`}
-                      variant='light'
-                      className='btn-sm mx-2'
-                    >
-                      <FaEdit />
-                    </Button>
-                    <Button
-                      variant='danger'
-                      className='btn-sm'
-                      onClick={() => deleteHandler(product._id)}
-                    >
-                      <FaTrash style={{ color: 'white' }} />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {data.products.map((product) => {
+                const primaryImage =
+                  product.images?.find((img) => img.primary) ||
+                  product.images?.[0];
+
+                return (
+                  <tr key={product._id}>
+                    <td>
+                      {primaryImage ? (
+                        <img
+                          src={primaryImage.url}
+                          alt={product.name}
+                          style={{
+                            width: '50px',
+                            height: '50px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: '0.8rem', color: '#888' }}>
+                          No image
+                        </span>
+                      )}
+                    </td>
+                    <td>{product.name}</td>
+                    <td>₹{product.price}</td>
+                    <td>{product.category}</td>
+                    <td>{product.brand}</td>
+                    <td>
+                      <Button
+                        as={Link}
+                        to={`/admin/product/${product._id}/edit`}
+                        variant='light'
+                        className='btn-sm mx-2'
+                      >
+                        <FaEdit />
+                      </Button>
+                      <Button
+                        variant='danger'
+                        className='btn-sm'
+                        onClick={() => deleteHandler(product._id)}
+                      >
+                        <FaTrash style={{ color: 'white' }} />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </Table>
           <Paginate pages={data.pages} page={data.page} isAdmin={true} />

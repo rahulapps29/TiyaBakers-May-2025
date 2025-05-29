@@ -1,12 +1,12 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import './Footer.css'; // Make sure to import your CSS file
+import './Footer.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className='footer-blue text-white mt-5'>
+    <footer className='footer-bakery mt-5'>
       <Container className='py-4'>
         <Row>
           <Col md={4} className='mb-3'>
@@ -22,24 +22,16 @@ const Footer = () => {
             <h5>Quick Links</h5>
             <ul className='list-unstyled'>
               <li>
-                <Link to='/about' className='text-white text-decoration-none'>
-                  About Us
-                </Link>
+                <Link to='/about'>About Us</Link>
+              </li>
+              {/* <li>
+                <Link to='/menu'>Our Menu</Link>
+              </li> */}
+              <li>
+                <Link to='/contact'>Contact</Link>
               </li>
               <li>
-                <Link to='/menu' className='text-white text-decoration-none'>
-                  Our Menu
-                </Link>
-              </li>
-              <li>
-                <Link to='/contact' className='text-white text-decoration-none'>
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to='/order' className='text-white text-decoration-none'>
-                  Order Online
-                </Link>
+                <Link to='/order'>Order Online</Link>
               </li>
             </ul>
           </Col>

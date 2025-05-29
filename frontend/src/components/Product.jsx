@@ -3,10 +3,23 @@ import { Link } from 'react-router-dom';
 import Rating from './Rating';
 
 const Product = ({ product }) => {
+  // Pick primary image from images array or fallback
+  const primaryImage = product.images?.find((img) => img.primary) ||
+    product.images?.[0] || { url: product.image };
+
   return (
     <Card className='my-3 p-3 rounded'>
       <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} variant='top' />
+        <Card.Img
+          src={primaryImage.url}
+          variant='top'
+          style={{
+            height: '200px',
+            objectFit: 'cover',
+            objectPosition: 'top center',
+            borderRadius: '6px',
+          }}
+        />
       </Link>
 
       <Card.Body>

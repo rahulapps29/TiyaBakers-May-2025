@@ -1,3 +1,41 @@
-.footer-blue {
-  background-color: #0d6efd; /* Bootstrap primary blue */
+.footer-bakery {
+  background-color: #fdf5e6;
+  color: #4b2e2b;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  border-top: 2px solid #4b2e2b;
+}
+
+.footer-bakery h5 {
+  color: #4b2e2b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.footer-bakery p,
+.footer-bakery a,
+.footer-bakery small {
+  color: #4b2e2b;
+  font-size: 0.95rem;
+}
+
+.footer-bakery ul {
+  padding-left: 0;
+}
+
+.footer-bakery li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-bakery a {
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-bakery a:hover {
+  color: #b88900;
+  text-decoration: underline;
+}
+
+.footer-bakery .border-top {
+  border-color: #cbb994 !important;
 }

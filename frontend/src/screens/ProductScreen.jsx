@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Row,
@@ -24,18 +23,12 @@ import { addToCart } from '../slices/cartSlice';
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [qty, setQty] = useState(1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-
-  const addToCartHandler = () => {
-    dispatch(addToCart({ ...product, qty }));
-    navigate('/cart');
-  };
 
   const {
     data: product,
@@ -45,13 +38,18 @@ const ProductScreen = () => {
   } = useGetProductDetailsQuery(productId);
 
   const { userInfo } = useSelector((state) => state.auth);
-
   const [createReview, { isLoading: loadingProductReview }] =
     useCreateReviewMutation();
 
+  const [mainImage, setMainImage] = useState(null);
+
+  const addToCartHandler = () => {
+    dispatch(addToCart({ ...product, qty }));
+    navigate('/cart');
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
       await createReview({
         productId,
@@ -65,11 +63,21 @@ const ProductScreen = () => {
     }
   };
 
+  const getPrimaryImage = () => {
+    if (product?.images?.length) {
+      return (
+        product.images.find((img) => img.primary)?.url || product.images[0]?.url
+      );
+    }
+    return product?.image;
+  };
+
   return (
     <>
       <Link className='btn btn-light my-3' to='/'>
         Go Back
       </Link>
+
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -79,10 +87,41 @@ const ProductScreen = () => {
       ) : (
         <>
           <Meta title={product.name} description={product.description} />
+
           <Row>
             <Col md={6}>
-              <Image src={product.image} alt={product.name} fluid />
+              <Image
+                src={mainImage || getPrimaryImage()}
+                alt={product.name}
+                fluid
+                className='mb-3'
+                style={{ borderRadius: '8px' }}
+              />
+
+              {/* Thumbnails */}
+              <div className='d-flex flex-wrap gap-2'>
+                {product.images?.map((img, idx) => (
+                  <Image
+                    key={idx}
+                    src={img.url}
+                    onClick={() => setMainImage(img.url)}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      cursor: 'pointer',
+                      objectFit: 'cover',
+                      border:
+                        mainImage === img.url
+                          ? '2px solid #007bff'
+                          : '1px solid #ccc',
+                      borderRadius: '4px',
+                    }}
+                    alt={`thumb-${idx}`}
+                  />
+                ))}
+              </div>
             </Col>
+
             <Col md={3}>
               <ListGroup variant='flush'>
                 <ListGroup.Item>
@@ -94,12 +133,13 @@ const ProductScreen = () => {
                     text={`${product.numReviews} reviews`}
                   />
                 </ListGroup.Item>
-                <ListGroup.Item>Price: ${product.price}</ListGroup.Item>
+                <ListGroup.Item>Price: ₹{product.price}</ListGroup.Item>
                 <ListGroup.Item>
                   Description: {product.description}
                 </ListGroup.Item>
               </ListGroup>
             </Col>
+
             <Col md={3}>
               <Card>
                 <ListGroup variant='flush'>
@@ -107,10 +147,11 @@ const ProductScreen = () => {
                     <Row>
                       <Col>Price:</Col>
                       <Col>
-                        <strong>${product.price}</strong>
+                        <strong>₹{product.price}</strong>
                       </Col>
                     </Row>
                   </ListGroup.Item>
+
                   <ListGroup.Item>
                     <Row>
                       <Col>Status:</Col>
@@ -120,7 +161,6 @@ const ProductScreen = () => {
                     </Row>
                   </ListGroup.Item>
 
-                  {/* Qty Select */}
                   {product.countInStock > 0 && (
                     <ListGroup.Item>
                       <Row>
@@ -146,7 +186,7 @@ const ProductScreen = () => {
 
                   <ListGroup.Item>
                     <Button
-                      className='btn-block'
+                      className='btn-block w-100'
                       type='button'
                       disabled={product.countInStock === 0}
                       onClick={addToCartHandler}
@@ -158,6 +198,7 @@ const ProductScreen = () => {
               </Card>
             </Col>
           </Row>
+
           <Row className='review'>
             <Col md={6}>
               <h2>Reviews</h2>
@@ -194,6 +235,7 @@ const ProductScreen = () => {
                           <option value='5'>5 - Excellent</option>
                         </Form.Control>
                       </Form.Group>
+
                       <Form.Group className='my-2' controlId='comment'>
                         <Form.Label>Comment</Form.Label>
                         <Form.Control
@@ -204,6 +246,7 @@ const ProductScreen = () => {
                           onChange={(e) => setComment(e.target.value)}
                         ></Form.Control>
                       </Form.Group>
+
                       <Button
                         disabled={loadingProductReview}
                         type='submit'

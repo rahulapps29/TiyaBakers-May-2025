@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useLogoutMutation } from '../slices/usersApiSlice';
 import { logout } from '../slices/authSlice';
 import SearchBox from './SearchBox';
-import logo from '../assets/TB.png';
+import logo from '../assets/TB2.png';
 import { resetCart } from '../slices/cartSlice';
 import './Header.css';
 
@@ -42,11 +42,11 @@ const Header = () => {
             <img
               src={logo}
               alt='Tiya Bakers'
-              width='40'
+              width='auto'
               height='40'
               className='d-inline-block align-top me-2'
             />
-            <span className='fw-bold fs-5'>Tiya Bakers</span>
+            {/* <span className='fw-bold fs-5'>Tiya Bakers</span> */}
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
@@ -81,10 +81,10 @@ const Header = () => {
                   <FaUser className='me-1' /> Sign In
                 </Nav.Link>
               )}
-              <Nav.Link as={Link} to='/menu'>
+              {/* <Nav.Link as={Link} to='/menu'>
                 <FaUser className='me-1' />
                 Menu
-              </Nav.Link>
+              </Nav.Link> */}
               {userInfo && userInfo.isAdmin && (
                 <NavDropdown title='Admin Panel' id='adminmenu'>
                   <NavDropdown.Item as={Link} to='/admin/productlist'>

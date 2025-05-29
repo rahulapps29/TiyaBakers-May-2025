@@ -8,6 +8,7 @@ import Message from '../components/Message';
 import Paginate from '../components/Paginate';
 // import ProductCarousel from '../components/ProductCarousel'; // Carousel commented
 import Meta from '../components/Meta';
+import './HomeScreen.css';
 
 const HomeScreen = () => {
   const { pageNumber, keyword } = useParams();
@@ -44,14 +45,15 @@ const HomeScreen = () => {
       ) : (
         <>
           <Meta />
-          <h1>Latest Products</h1>
-          <Row>
+          <h1 className='home-title'>Fresh on the Menu</h1>
+          <Row className='product-grid'>
             {data.products.map((product) => (
               <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
                 <Product product={product} />
               </Col>
             ))}
           </Row>
+
           <Paginate
             pages={data.pages}
             page={data.page}

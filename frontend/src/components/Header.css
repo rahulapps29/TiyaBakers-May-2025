@@ -1,3 +1,30 @@
 .custom-blue-navbar {
-  background-color: #0d6efd !important; /* A soft bakery-style blue */
+  background-color: #fdf5e6 !important; /* A soft bakery-style blue */
+  color: #4b2e2b !important;
+}
+
+.custom-blue-navbar {
+  background-color: #fdf5e6; /* Soft off-white */
+  border-bottom: 2px solid #4b2e2b;
+}
+
+.custom-blue-navbar .navbar-brand,
+.custom-blue-navbar .nav-link,
+.custom-blue-navbar .nav-dropdown .dropdown-toggle,
+.custom-blue-navbar .dropdown-item {
+  color: #4b2e2b !important;
+  font-weight: 500;
+}
+
+.custom-blue-navbar .nav-link:hover,
+.custom-blue-navbar .dropdown-item:hover {
+  color: #b88900 !important; /* Rustic gold on hover */
+}
+
+.custom-blue-navbar .navbar-toggler {
+  border-color: #4b2e2b;
+}
+
+.custom-blue-navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%234B2E2B' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }

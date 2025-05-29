@@ -27,10 +27,12 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: String,
-      required: true,
-    },
+    images: [
+      {
+        url: { type: String, required: true },
+        primary: { type: Boolean, default: false },
+      },
+    ],
     brand: {
       type: String,
       required: true,
