@@ -1,20 +1,5 @@
 const products = [
   {
-    name: 'Chocolate Truffle Cake',
-    images: [
-      { url: '/images/chocolate-truffle.jpg', primary: true },
-      { url: '/images/chocolate-truffle2.webp', primary: false },
-    ],
-    description:
-      'Rich and moist chocolate sponge layered with creamy chocolate ganache. Perfect for birthdays and celebrations.',
-    brand: 'Tiya Bakers',
-    category: 'Cake',
-    price: 550,
-    countInStock: 8,
-    rating: 4.8,
-    numReviews: 18,
-  },
-  {
     name: 'Red Velvet Cupcake',
     images: [
       { url: '/images/red-velvet-cupcake.png', primary: true },
@@ -59,6 +44,22 @@ const products = [
     rating: 4.6,
     numReviews: 14,
   },
+  {
+    name: 'Chocolate Truffle Cake',
+    images: [
+      { url: '/images/chocolate-truffle.jpg', primary: true },
+      { url: '/images/chocolate-truffle2.webp', primary: false },
+    ],
+    description:
+      'Rich and moist chocolate sponge layered with creamy chocolate ganache. Perfect for birthdays and celebrations.',
+    brand: 'Tiya Bakers',
+    category: 'Cake',
+    price: 550,
+    countInStock: 8,
+    rating: 4.8,
+    numReviews: 18,
+  },
+
   {
     name: 'Choco Chip Muffin',
     images: [
