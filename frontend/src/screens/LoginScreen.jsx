@@ -34,8 +34,9 @@ const LoginScreen = () => {
     e.preventDefault();
     try {
       const res = await login({ email, password }).unwrap();
+      console.log('token hai', res);
       dispatch(setCredentials({ ...res }));
-      console.log(res.token); // Should print the token
+      // console.log(res.token);
       navigate(redirect);
     } catch (err) {
       toast.error(err?.data?.message || err.error);

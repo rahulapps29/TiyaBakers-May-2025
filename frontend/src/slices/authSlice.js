@@ -12,7 +12,11 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action) => {
       state.userInfo = action.payload;
+      console.log('userInfo:', state.userInfo); // ✅ readable
       localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      if (action.payload.token) {
+        localStorage.setItem('token', action.payload.token); // 🔐 store token
+      }
     },
     logout: (state, action) => {
       state.userInfo = null;
