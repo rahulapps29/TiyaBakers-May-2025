@@ -8,6 +8,8 @@ import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import addressRoutes from './routes/addressRoutes.js';
+
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 
@@ -17,10 +19,23 @@ connectDB();
 
 const app = express();
 // Basic CORS configuration
+const allowedOrigins = [
+  'https://tiyabakers.orbe.in',
+  'https://tiyabakersb.orbe.in',
+];
+
 app.use(
   cors({
-    origin: 'https://tiyabakers.orbe.in', // replace with your frontend URL
-    credentials: true, // allow cookies if needed
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
@@ -30,6 +45,7 @@ app.use(cookieParser());
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/address', addressRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 
