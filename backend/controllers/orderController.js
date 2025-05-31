@@ -30,10 +30,14 @@ const addOrderItems = asyncHandler(async (req, res) => {
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
       );
       return {
-        ...itemFromClient,
+        name: itemFromClient.name,
+        qty: itemFromClient.qty,
+        image:
+          itemFromClient.images?.find((img) => img.primary)?.url ||
+          itemFromClient.images?.[0]?.url ||
+          '/images/default.jpg',
+        price: matchingItemFromDB.price, // ✅ trusted from DB
         product: itemFromClient._id,
-        price: matchingItemFromDB.price,
-        _id: undefined,
       };
     });
 

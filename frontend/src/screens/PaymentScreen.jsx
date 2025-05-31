@@ -8,6 +8,8 @@ import { savePaymentMethod } from '../slices/cartSlice';
 
 const PaymentScreen = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const cart = useSelector((state) => state.cart);
   const { shippingAddress } = cart;
 
@@ -17,9 +19,7 @@ const PaymentScreen = () => {
     }
   }, [navigate, shippingAddress]);
 
-  const [paymentMethod, setPaymentMethod] = useState('PayPal');
-
-  const dispatch = useDispatch();
+  const [paymentMethod, setPaymentMethod] = useState('Razorpay');
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -38,13 +38,24 @@ const PaymentScreen = () => {
             <Form.Check
               className='my-2'
               type='radio'
-              label='PayPal or Credit Card'
-              id='PayPal'
+              label='Razorpay'
+              id='Razorpay'
               name='paymentMethod'
-              value='PayPal'
-              checked
+              value='Razorpay'
+              checked={paymentMethod === 'Razorpay'}
               onChange={(e) => setPaymentMethod(e.target.value)}
-            ></Form.Check>
+            />
+
+            <Form.Check
+              className='my-2'
+              type='radio'
+              label='Cash on Delivery (COD)'
+              id='COD'
+              name='paymentMethod'
+              value='COD'
+              checked={paymentMethod === 'COD'}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            />
           </Col>
         </Form.Group>
 
