@@ -1,82 +1,39 @@
-import Razorpay from 'razorpay';
-import axios from 'axios';
 import asyncHandler from 'express-async-handler';
+import Razorpay from 'razorpay';
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
+import dotenv from 'dotenv';
+const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// @desc    Create Razorpay Standard Checkout Session (v2)
-// @route   POST /api/payment/razorpay/session
-// @access  Public
-export const createRazorpaySession = asyncHandler(async (req, res) => {
-  const key_id = process.env.RAZORPAY_KEY_ID;
-  const key_secret = process.env.RAZORPAY_KEY_SECRET;
-  const authToken = Buffer.from(`${key_id}:${key_secret}`).toString('base64');
+dotenv.config();
 
+export const createOrder = async (req, res) => {
   try {
-    const response = await axios.post(
-      'https://api.razorpay.com/v2/standard_checkout/preferences',
-      {
-        customer: {
-          name: req.body.name,
-          email: req.body.email,
-          contact: req.body.contact,
-        },
-        currency: 'INR',
-        amount: req.body.amount, // in paise
-      },
-      {
-        headers: {
-          Authorization: `Basic ${authToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    console.log('✅ Creating Razorpay Order...');
+    console.log('Requested amount:', req.body.amount);
+    console.log(process.env.RAZORPAY_KEY_ID);
 
-    res.status(200).json(response.data); // Includes session_token
-  } catch (error) {
-    console.error(
-      'Razorpay session error:',
-      error.response?.data || error.message
-    );
-    res.status(500).json({ message: 'Razorpay session creation failed' });
-  }
-});
+    const instance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
 
-// @desc    Create Razorpay Classic Order (v1)
-// @route   POST /api/payment/razorpay
-// @access  Public
-export const createRazorpayOrder = asyncHandler(async (req, res) => {
-  const { amount } = req.body;
-
-  if (!amount) {
-    res.status(400);
-    throw new Error('Amount is required to create Razorpay order');
-  }
-
-  try {
     const options = {
-      amount, // Amount in paise (e.g., ₹100 = 10000)
+      amount: req.body.amount,
       currency: 'INR',
-      receipt: `receipt_order_${Date.now()}`,
-      payment_capture: 1,
+      receipt: 'receipt_order_' + Date.now(),
     };
 
-    const order = await razorpay.orders.create(options);
-
-    res.status(200).json({
-      id: order.id,
-      currency: order.currency,
-      amount: order.amount,
-    });
+    const order = await instance.orders.create(options);
+    console.log('✅ Razorpay order created:', order);
+    res.json(order);
   } catch (error) {
-    console.error('Razorpay error:', error);
+    console.error('🔴 Razorpay createOrder error:', error);
     res.status(500).json({ message: 'Failed to create Razorpay order' });
   }
-});
+};
 
 // @desc    Handle Cash on Delivery Order
 // @route   POST /api/payment/cod

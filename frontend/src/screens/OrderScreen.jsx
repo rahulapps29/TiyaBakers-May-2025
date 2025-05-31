@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import Message from '../components/Message';
+import axios from 'axios';
 import Loader from '../components/Loader';
+import Message from '../components/Message';
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
@@ -16,15 +16,14 @@ const OrderScreen = () => {
 
   const {
     data: order,
-    refetch,
     isLoading,
     error,
+    refetch,
   } = useGetOrderDetailsQuery(orderId);
 
   const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
-
   const { userInfo } = useSelector((state) => state.auth);
 
   const handleRazorpayPayment = async () => {
@@ -40,58 +39,69 @@ const OrderScreen = () => {
     const res = await loadScript(
       'https://checkout.razorpay.com/v1/checkout.js'
     );
-
     if (!res) {
-      toast.error('Razorpay SDK failed to load. Are you online?');
+      toast.error('Razorpay SDK failed to load.');
       return;
     }
 
+    let razorpayOrder;
     try {
-      const razorpayOrder = await fetch('/api/payment/razorpay', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: order.totalPrice * 100,
-        }),
-      }).then((res) => res.json());
-
-      const options = {
-        key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your real key or load from env
-        currency: 'INR',
-        amount: razorpayOrder.amount,
-        order_id: razorpayOrder.id,
-        name: 'Tiya Bakers',
-        description: 'Order Payment',
-        handler: async function (response) {
-          try {
-            await payOrder({
-              orderId,
-              details: {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                method: 'Razorpay',
-              },
-            });
-            refetch();
-            toast.success('Payment successful');
-          } catch (err) {
-            toast.error(err?.data?.message || err.error);
-          }
-        },
-        prefill: {
-          name: order.user.name,
-          email: order.user.email,
-        },
-      };
-
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
+      const res = await axios.post(
+        'https://tiyabakersb.orbe.in/api/payment/order',
+        { amount: order.totalPrice * 100 },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      razorpayOrder = res.data;
     } catch (err) {
-      toast.error('Razorpay error: ' + err.message);
+      console.error(
+        'Razorpay order creation failed:',
+        err.response?.data || err.message
+      );
+      toast.error(
+        'Server error: ' + (err.response?.data?.message || err.message)
+      );
+      return;
     }
+
+    const options = {
+      key: window.__RZP_KEY__ || 'rzp_test_yourfallbackkey',
+      amount: razorpayOrder.amount,
+      currency: 'INR',
+      name: 'Tiya Bakers',
+      description: 'Order Payment',
+      order_id: razorpayOrder.id,
+      handler: async function (response) {
+        try {
+          await payOrder({
+            orderId,
+            details: {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              method: 'Razorpay',
+            },
+          });
+          refetch();
+          toast.success('Payment successful');
+        } catch (err) {
+          toast.error(err?.data?.message || err.error);
+        }
+      },
+      prefill: {
+        name: order.user.name,
+        email: order.user.email,
+      },
+      theme: {
+        color: '#3399cc',
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   const deliverHandler = async () => {
@@ -102,7 +112,7 @@ const OrderScreen = () => {
   return isLoading ? (
     <Loader />
   ) : error ? (
-    <Message variant='danger'>{error.data.message}</Message>
+    <Message variant='danger'>{error?.data?.message || error.error}</Message>
   ) : (
     <>
       <h1>Order {order._id}</h1>
@@ -135,8 +145,7 @@ const OrderScreen = () => {
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
-                <strong>Method: </strong>
-                {order.paymentMethod}
+                <strong>Method: </strong> {order.paymentMethod}
               </p>
               {order.isPaid ? (
                 <Message variant='success'>Paid on {order.paidAt}</Message>
@@ -224,21 +233,17 @@ const OrderScreen = () => {
               )}
 
               {loadingDeliver && <Loader />}
-
-              {userInfo &&
-                userInfo.isAdmin &&
-                order.isPaid &&
-                !order.isDelivered && (
-                  <ListGroup.Item>
-                    <Button
-                      type='button'
-                      className='btn btn-block'
-                      onClick={deliverHandler}
-                    >
-                      Mark As Delivered
-                    </Button>
-                  </ListGroup.Item>
-                )}
+              {userInfo?.isAdmin && order.isPaid && !order.isDelivered && (
+                <ListGroup.Item>
+                  <Button
+                    type='button'
+                    className='btn btn-block'
+                    onClick={deliverHandler}
+                  >
+                    Mark As Delivered
+                  </Button>
+                </ListGroup.Item>
+              )}
             </ListGroup>
           </Card>
         </Col>
