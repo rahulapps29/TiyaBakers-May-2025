@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import Message from '../components/Message';
@@ -9,7 +8,6 @@ import Loader from '../components/Loader';
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
-  useGetPaypalClientIdQuery,
   usePayOrderMutation,
 } from '../slices/ordersApiSlice';
 
@@ -24,77 +22,77 @@ const OrderScreen = () => {
   } = useGetOrderDetailsQuery(orderId);
 
   const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
-
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
-
-  const {
-    data: paypal,
-    isLoading: loadingPayPal,
-    error: errorPayPal,
-  } = useGetPaypalClientIdQuery();
-
-  useEffect(() => {
-    if (!errorPayPal && !loadingPayPal && paypal.clientId) {
-      const loadPaypalScript = async () => {
-        paypalDispatch({
-          type: 'resetOptions',
-          value: {
-            'client-id': paypal.clientId,
-            currency: 'USD',
-          },
-        });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
-      };
-      if (order && !order.isPaid) {
-        if (!window.paypal) {
-          loadPaypalScript();
-        }
-      }
-    }
-  }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
-
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        await payOrder({ orderId, details });
-        refetch();
-        toast.success('Order is paid');
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
-    });
-  }
-
-  // TESTING ONLY! REMOVE BEFORE PRODUCTION
-  // async function onApproveTest() {
-  //   await payOrder({ orderId, details: { payer: {} } });
-  //   refetch();
-
-  //   toast.success('Order is paid');
-  // }
-
-  function onError(err) {
-    toast.error(err.message);
-  }
-
-  function createOrder(data, actions) {
-    return actions.order
-      .create({
-        purchase_units: [
-          {
-            amount: { value: order.totalPrice },
-          },
-        ],
-      })
-      .then((orderID) => {
-        return orderID;
+  const handleRazorpayPayment = async () => {
+    const loadScript = (src) =>
+      new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
       });
-  }
+
+    const res = await loadScript(
+      'https://checkout.razorpay.com/v1/checkout.js'
+    );
+
+    if (!res) {
+      toast.error('Razorpay SDK failed to load. Are you online?');
+      return;
+    }
+
+    try {
+      const razorpayOrder = await fetch('/api/payment/razorpay', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: order.totalPrice * 100,
+        }),
+      }).then((res) => res.json());
+
+      const options = {
+        key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your real key or load from env
+        currency: 'INR',
+        amount: razorpayOrder.amount,
+        order_id: razorpayOrder.id,
+        name: 'Tiya Bakers',
+        description: 'Order Payment',
+        handler: async function (response) {
+          try {
+            await payOrder({
+              orderId,
+              details: {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                method: 'Razorpay',
+              },
+            });
+            refetch();
+            toast.success('Payment successful');
+          } catch (err) {
+            toast.error(err?.data?.message || err.error);
+          }
+        },
+        prefill: {
+          name: order.user.name,
+          email: order.user.email,
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (err) {
+      toast.error('Razorpay error: ' + err.message);
+    }
+  };
 
   const deliverHandler = async () => {
     await deliverOrder(orderId);
@@ -121,9 +119,8 @@ const OrderScreen = () => {
                 <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
               </p>
               <p>
-                <strong>Address:</strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
-                {order.shippingAddress.postalCode},{' '}
+                <strong>Address:</strong> {order.shippingAddress.address},{' '}
+                {order.shippingAddress.city} {order.shippingAddress.postalCode},{' '}
                 {order.shippingAddress.country}
               </p>
               {order.isDelivered ? (
@@ -181,6 +178,7 @@ const OrderScreen = () => {
             </ListGroup.Item>
           </ListGroup>
         </Col>
+
         <Col md={4}>
           <Card>
             <ListGroup variant='flush'>
@@ -211,31 +209,17 @@ const OrderScreen = () => {
                   <Col>₹{order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
+
+              {!order.isPaid && order.paymentMethod === 'Razorpay' && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
-
-                  {isPending ? (
-                    <Loader />
-                  ) : (
-                    <div>
-                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-                      {/* <Button
-                        style={{ marginBottom: '10px' }}
-                        onClick={onApproveTest}
-                      >
-                        Test Pay Order
-                      </Button> */}
-
-                      <div>
-                        <PayPalButtons
-                          createOrder={createOrder}
-                          onApprove={onApprove}
-                          onError={onError}
-                        ></PayPalButtons>
-                      </div>
-                    </div>
-                  )}
+                  <Button
+                    type='button'
+                    className='btn btn-block'
+                    onClick={handleRazorpayPayment}
+                  >
+                    Pay with Razorpay
+                  </Button>
                 </ListGroup.Item>
               )}
 
